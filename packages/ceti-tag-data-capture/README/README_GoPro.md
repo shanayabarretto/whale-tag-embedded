@@ -1,13 +1,15 @@
-### Should be updated later ###
+# GoPro
+
+**Should be updated later**
 
 This readme file provides a brief introduction on goPro system.
 
 
 ## Requirement
-Install python bluetooth modules to use goPros. 
+Install python bluetooth modules to use goPros.
 Python version >=3.8. We used version 3.9 for this setting. The pip install should be run using "sudo".
 
-```
+```bash
 cd 
 git clone https://github.com/gopro/OpenGoPro.git
 cd OpenGoPro/demos/python/tutorial/
@@ -16,32 +18,31 @@ sudo pip install bleak
 ```
 
 ## Building
-### 1. Clone the github repo.
-```
+### 1. Clone the Github repository
+```bash
 cd
 git clone https://github.com/Project-CETI/whale-tag-embedded.git
 cd whale-tag-embedded
 git fetch origin
 git checkout -b v2_2_refactor_goPros remotes/origin/v2_2_refactor_goPros
 ```
-### 2. Prepare to run the code.
-   
+### 2. Prepare to run the code
 Make the data folder that stores data.
-```
+```bash
 sudo mkdir -p /data
 sudo chmod 777 /data
 ```
 
 Make the command files that control the operation.
-```
+```bash
 cd ~/whale-tag-embedded/packages/ceti-tag-data-capture/ipc/
 touch cetiCommand
 touch cetiResponse
 ```
-### 3. Compile the c code.
+### 3. Compile the c code
 
 Compile the c code as below.
-``` 
+```bash
 cd ~/whale-tag-embedded/packages/ceti-tag-data-capture
 (find src/ -name "*.o" -type f -delete); (rm bin/cetiTagApp); make
 (cd bin; sudo ./cetiTagApp)
@@ -52,13 +53,13 @@ cd ~/whale-tag-embedded/packages/ceti-tag-data-capture
 
 Run the code by using following commands.
 
-```
+```bash
 cd ~/whale-tag-embedded/packages/ceti-tag-data-capture
 (cd bin; sudo ./cetiTagApp)
 ```
 
 Quit the code by using following commands in the another terminal.
-```
+```bash
 cd ~/whale-tag-embedded/packages/ceti-tag-data-capture/ipc/
 echo "quit" > cetiCommand
 ```
