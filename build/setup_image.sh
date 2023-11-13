@@ -111,8 +111,8 @@ tar -cf - -C "${OVERLAY_DIR}" --owner=pi --group=pi . | tar -xf - -C /
 
 # Add useful commands to the bash history.
 rm -f /home/pi/.bash_history
-dos2unix /usr/lib/raspberrypi-sys-mods/custom_bash_history.txt
-mv /usr/lib/raspberrypi-sys-mods/custom_bash_history.txt /home/pi/.bash_history
+dos2unix /usr/lib/raspberrypi-sys-mods/custom_bash_history
+mv /usr/lib/raspberrypi-sys-mods/custom_bash_history /home/pi/.bash_history
 
 # All done
 echo "( ・◡・)つ━☆   Build complete"

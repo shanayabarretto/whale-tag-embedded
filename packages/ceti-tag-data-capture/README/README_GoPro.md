@@ -18,7 +18,7 @@ sudo pip install bleak
 ```
 
 ## Building
-### 1. Clone the Github repository
+### 1. Clone the GitHub repository
 ```bash
 cd
 git clone https://github.com/Project-CETI/whale-tag-embedded.git
