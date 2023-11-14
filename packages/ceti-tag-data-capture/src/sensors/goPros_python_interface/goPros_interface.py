@@ -11,7 +11,7 @@ import socket
 import sys
 import time
 from binascii import hexlify
-from ctypes import c_uint32, sizeof, Structure
+from ctypes import Structure, c_uint32, sizeof
 
 from bleak import BleakClient
 from tutorial_modules import GOPRO_BASE_UUID, connect_ble, logger
