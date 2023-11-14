@@ -55,7 +55,7 @@ int get_cpu_id_for_tid(int tid);
 float get_cpu_temperature_c();
 float get_gpu_temperature_c();
 void force_system_log_rotation();
-int system_call_with_output(char *cmd, char *result);
+int system_call_with_output(char *cmd, char *result, size_t result_size);
 void *systemMonitor_thread(void *paramPtr);
 
 //-----------------------------------------------------------------------------

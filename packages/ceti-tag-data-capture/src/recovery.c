@@ -245,7 +245,7 @@ int getGpsLocation(char *gpsLocation) {
     pTempWr = buf;                       // reset the static write pointer
     gpsLocation[strcspn(gpsLocation, "\r\n")] = 0;
   } else { // No complete sentence was available on this cycle, try again next time through
-    strcpy(gpsLocation, "No GPS update available");
+    strncpy(gpsLocation, "No GPS update available");
     CETI_LOG("XXX No GPS update available");
     return -1;
   }

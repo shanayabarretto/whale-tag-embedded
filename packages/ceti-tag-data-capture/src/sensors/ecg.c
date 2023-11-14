@@ -95,7 +95,7 @@ int init_ecg_data_file(int restarted_program) {
                                               "init_ecg_data_file()");
   // Change the note from restarted to new file if this is not the first initialization.
   if (!restarted_program)
-    snprintf(ecg_data_file_notes[ecg_buffer_select_toLog][0], 75, "New log file! | ");
+    snprintf(ecg_data_file_notes[ecg_buffer_select_toLog][0], sizeof(ecg_data_file_notes[ecg_buffer_select_toLog][0]), "New log file! | ");
   return init_data_file_success;
 }
 
@@ -178,7 +178,7 @@ void *ecg_thread_getData(void *paramPtr) {
       // So also check if the ADC returned exactly 0 many times in a row.
       if (ecg_readings[ecg_buffer_select_toLog][ecg_buffer_index_toLog] == ECG_INVALID_PLACEHOLDER) {
         is_invalid = 1;
-        strcat(ecg_data_file_notes[ecg_buffer_select_toLog][ecg_buffer_index_toLog], "ADC ERROR | ");
+        strcat(ecg_data_file_notes[ecg_buffer_select_toLog][ecg_buffer_index_toLog], "ADC ERROR | "); // NOLINT(runtime/printf)
         CETI_LOG("XXX ADC encountered an error");
       }
       if (ecg_readings[ecg_buffer_select_toLog][ecg_buffer_index_toLog] == 0)
@@ -187,20 +187,20 @@ void *ecg_thread_getData(void *paramPtr) {
         consecutive_zero_ecg_count = 0;
       if (consecutive_zero_ecg_count > ECG_ZEROCOUNT_THRESHOLD) {
         is_invalid = 1;
-        strcat(ecg_data_file_notes[ecg_buffer_select_toLog][ecg_buffer_index_toLog], "ADC ZEROS | ");
+        strcat(ecg_data_file_notes[ecg_buffer_select_toLog][ecg_buffer_index_toLog], "ADC ZEROS | "); // NOLINT(runtime/printf)
         CETI_LOG("ADC returned %ld zero readings in a row", consecutive_zero_ecg_count);
       }
       // Check if there was an error communicating with the GPIO expander.
       if (leadsOff_readings_p[ecg_buffer_select_toLog][ecg_buffer_index_toLog] == ECG_LEADSOFF_INVALID_PLACEHOLDER ||
           leadsOff_readings_n[ecg_buffer_select_toLog][ecg_buffer_index_toLog] == ECG_LEADSOFF_INVALID_PLACEHOLDER) {
         is_invalid = 1;
-        strcat(ecg_data_file_notes[ecg_buffer_select_toLog][ecg_buffer_index_toLog], "LO ERROR | ");
+        strcat(ecg_data_file_notes[ecg_buffer_select_toLog][ecg_buffer_index_toLog], "LO ERROR | "); // NOLINT(runtime/printf)
         CETI_LOG("XXX The GPIO expander encountered an error");
       }
       // Check if it took longer than expected to receive the sample (from the ADC and the GPIO expander combined).
       if (instantaneous_sampling_period_us > ECG_SAMPLE_TIMEOUT_US && !first_sample) {
         is_invalid = 1;
-        strcat(ecg_data_file_notes[ecg_buffer_select_toLog][ecg_buffer_index_toLog], "TIMEOUT | ");
+        strcat(ecg_data_file_notes[ecg_buffer_select_toLog][ecg_buffer_index_toLog], "TIMEOUT | "); // NOLINT(runtime/printf)
         CETI_LOG("XXX Reading a sample took %ld us", instantaneous_sampling_period_us);
       }
       first_sample = 0;
@@ -208,7 +208,7 @@ void *ecg_thread_getData(void *paramPtr) {
       //  wait a bit and then try to reconnect to them.
       if (is_invalid && !g_stopAcquisition) {
         ecg_gpio_expander_set_leds_red();
-        strcat(ecg_data_file_notes[ecg_buffer_select_toLog][ecg_buffer_index_toLog], "INVALID? | ");
+        strcat(ecg_data_file_notes[ecg_buffer_select_toLog][ecg_buffer_index_toLog], "INVALID? | "); // NOLINT(runtime/printf)
         usleep(1000000);
         init_ecg_electronics();
         usleep(10000);

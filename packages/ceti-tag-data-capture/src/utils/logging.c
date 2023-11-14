@@ -34,24 +34,24 @@ int init_data_file(FILE *data_file, const char *data_filepath,
   }
   // Write headers if the file didn't already exist.
   if (!data_file_exists) {
-    char header[500] = "";
-
-    strcat(header, "Timestamp [us]");
-    strcat(header, ",RTC Count");
-    strcat(header, ",Notes");
+    fprintf(data_file, 
+            "Timestamp [us]"
+            ",RTC Count"
+            ",Notes"
+    );
     for (int i = 0; i < num_data_file_headers; i++) {
-      strcat(header, ",");
-      strcat(header, data_file_headers[i]);
+      fprintf(data_file, ",");
+      fprintf(data_file, data_file_headers[i]);
     }
-    strcat(header, "\n");
-    fprintf(data_file, "%s", header);
+    fprintf(data_file, "\n");
     CETI_LOG("%s: Created a new output data file: %s", log_tag, data_filepath);
   } else {
     CETI_LOG("%s: Using the existing output data file: %s", log_tag,
              data_filepath);
   }
   // Add notes for the first timestep to indicate that logging was restarted.
-  strcat(data_file_notes, "Restarted! | ");
+  if(data_file_notes != NULL)
+    strcat(data_file_notes, "Restarted! | ");  // NOLINT(runtime/printf)
   // Close the file.
   fclose(data_file);
   return 0;

@@ -200,7 +200,7 @@ void *systemMonitor_thread(void *paramPtr) {
         fprintf(systemMonitor_data_file, ",%d", rtc_count);
         // Write any notes, then clear them so they are only written once.
         fprintf(systemMonitor_data_file, ",%s", systemMonitor_data_file_notes);
-        strcpy(systemMonitor_data_file_notes, "");
+        systemMonitor_data_file_notes[0] = '\0';
         // Write the system usage data.
         for (int cpu_entry_index = 0; cpu_entry_index < NUM_CPU_ENTRIES;
              cpu_entry_index++)
@@ -355,7 +355,7 @@ int32_t get_overlay_free_kb() {
   char available_kb[20] = "";
   int system_success = system_call_with_output(
       "df --output=source,avail | grep overlay | awk '{print $2}'",
-      available_kb);
+      available_kb, sizeof(available_kb));
   if (system_success == -1 || strlen(available_kb) == 0)
     return -1;
   return (int32_t)atof(available_kb);
@@ -365,7 +365,7 @@ int32_t get_root_free_kb() {
   char available_kb[20] = "";
   int system_success = system_call_with_output(
       "df --output=source,avail | grep /dev/root | awk '{print $2}'",
-      available_kb);
+      available_kb, sizeof(available_kb));
   if (system_success == -1 || strlen(available_kb) == 0)
     return -1;
   return (int32_t)atof(available_kb);
@@ -374,7 +374,7 @@ int32_t get_root_free_kb() {
 int32_t get_dataPartition_free_kb() {
   char available_kb[20] = "";
   int system_success = system_call_with_output(
-      "df --output=target,avail | grep /data | awk '{print $2}'", available_kb);
+      "df --output=target,avail | grep /data | awk '{print $2}'", available_kb, sizeof(available_kb));
   if (system_success == -1 || strlen(available_kb) == 0)
     return -1;
   return (int32_t)atof(available_kb);
@@ -498,7 +498,7 @@ int get_cpu_id_for_tid(int tid) {
 
 float get_cpu_temperature_c() {
   char temperature_c_str[20] = "";
-  int system_success = system_call_with_output("cat /sys/devices/virtual/thermal/thermal_zone0/temp | awk '{print $1/1000}'", temperature_c_str);
+  int system_success = system_call_with_output("cat /sys/devices/virtual/thermal/thermal_zone0/temp | awk '{print $1/1000}'", temperature_c_str, sizeof(temperature_c_str));
   if (system_success == -1)
     return -1;
   return atof(temperature_c_str);
@@ -506,7 +506,7 @@ float get_cpu_temperature_c() {
 
 float get_gpu_temperature_c() {
   char temperature_c_str[20] = "";
-  int system_success = system_call_with_output("vcgencmd measure_temp | egrep  -o  '[[:digit:]]*\\.[[:digit:]]*'", temperature_c_str);
+  int system_success = system_call_with_output("vcgencmd measure_temp | egrep  -o  '[[:digit:]]*\\.[[:digit:]]*'", temperature_c_str, sizeof(temperature_c_str));
   if (system_success == -1)
     return -1;
   return atof(temperature_c_str);
@@ -517,7 +517,7 @@ float get_gpu_temperature_c() {
 
 int32_t get_log_size_kb() {
   char log_size_kb[20] = "";
-  int system_success = system_call_with_output("du /var/log/ 2>/dev/null | grep /var/log/$ | awk '{print $1}'", log_size_kb);
+  int system_success = system_call_with_output("du /var/log/ 2>/dev/null | grep /var/log/$ | awk '{print $1}'", log_size_kb, sizeof(log_size_kb));
   if (system_success == -1 || strlen(log_size_kb) == 0)
     return -1;
   return (int32_t)atof(log_size_kb);
@@ -538,24 +538,24 @@ void force_system_log_rotation() {
   char system_response[100];
   int64_t log_rotation_time_us = get_global_time_us();
   // Rotate the logs.
-  system_call_with_output("sudo logrotate -f /etc/logrotate.d/rsyslog", system_response);
+  system_call_with_output("sudo logrotate -f /etc/logrotate.d/rsyslog", system_response, sizeof(system_response));
   // Check if it archived any old logs.
   // The configuration in firstboot tells it to use /var/log/old_logs for old
   // files.
   if (system_call_with_output("ls -l /var/log/old_logs/ | wc -l",
-                              system_response) != -1) {
+                              system_response, sizeof(system_response)) != -1) {
     // subtract 1 for the line that lists the total count
     int num_old_log_files = atof(system_response) - 1;
     if (num_old_log_files > 0) {
       // Make a directory for the old logs on the data partition.
-      system_call_with_output("sudo mkdir /data/logs", system_response);
+      system_call_with_output("sudo mkdir /data/logs", system_response, sizeof(system_response));
       snprintf(system_command, sizeof(system_command),
                "sudo mkdir /data/logs/logs_copied_%lld", log_rotation_time_us);
-      system_call_with_output(system_command, system_response);
+      system_call_with_output(system_command, system_response, sizeof(system_response));
       // Move the old logs to the data partition.
       snprintf(system_command, sizeof(system_command),
                "sudo mv /var/log/old_logs/* /data/logs/logs_copied_%lld", log_rotation_time_us);
-      system_call_with_output(system_command, system_response);
+      system_call_with_output(system_command, system_response, sizeof(system_response));
     }
   }
 }
@@ -564,7 +564,7 @@ void force_system_log_rotation() {
 //------------------------------------------
 
 // Run a system command and read the output.
-int system_call_with_output(char *cmd, char *result) {
+int system_call_with_output(char *cmd, char *result, size_t result_capacity) {
   result[0] = '\0'; //strcpy(result, "");
   FILE *system_pipe;
 
@@ -578,7 +578,7 @@ int system_call_with_output(char *cmd, char *result) {
   /* Read the output a line at a time. */
   char result_line[100];
   while (fgets(result_line, sizeof(result_line), system_pipe) != NULL)
-    strcat(result, result_line);
+    result_capacity -= snprintf(result, result_capacity, result_line);
 
   /* close the pipe */
   pclose(system_pipe);
