@@ -11,8 +11,7 @@ import socket
 import sys
 import time
 from binascii import hexlify
-from ctypes import *
-from typing import Optional
+from ctypes import c_uint32, sizeof, Structure
 
 from bleak import BleakClient
 from tutorial_modules import GOPRO_BASE_UUID, connect_ble, logger
@@ -181,10 +180,10 @@ async def main() -> None:
             print("Connected to %s" % repr(c_server_address))
         except AttributeError as ae:
             pass
-            # print("Error creating the socket: %s" % str(ae))
+            print("Error creating the socket: %s" % str(ae))
         except socket.error as se:
             pass
-            # print("Exception on socket: %s" % str(se))
+            print("Exception on socket: %s" % str(se))
         if not is_connected:
             time.sleep(0.1)
     if not is_connected:
