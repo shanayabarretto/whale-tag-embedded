@@ -50,8 +50,8 @@ int init_data_file(FILE *data_file, const char *data_filepath,
              data_filepath);
   }
   // Add notes for the first timestep to indicate that logging was restarted.
-  if(data_file_notes != NULL)
-    strcat(data_file_notes, "Restarted! | ");  // NOLINT(runtime/printf)
+  if (data_file_notes != NULL)
+    strcat(data_file_notes, "Restarted! | "); // NOLINT(runtime/printf)
   // Close the file.
   fclose(data_file);
   return 0;
