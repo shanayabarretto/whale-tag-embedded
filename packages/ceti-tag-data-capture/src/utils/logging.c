@@ -37,8 +37,7 @@ int init_data_file(FILE *data_file, const char *data_filepath,
     fprintf(data_file,
             "Timestamp [us]"
             ",RTC Count"
-            ",Notes"
-    );
+            ",Notes");
     for (int i = 0; i < num_data_file_headers; i++) {
       fprintf(data_file, ",");
       fprintf(data_file, data_file_headers[i]);
